@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CreateQuestion;
+use App\Http\Requests\EditQuestion;
 use App\Models\Answer;
 use App\Models\Question;
 use Carbon\Carbon;
@@ -14,7 +15,7 @@ class QuestionController extends Controller
     {
         $questions = Question::orderBy('id', 'desc')->get();
 
-        return view('questions/index', [
+        return view('questions.index', [
             'questions' => $questions,
         ]);
     }
@@ -32,6 +33,7 @@ class QuestionController extends Controller
             'question' => $question,
             'answers' => $answers,
         ]);
+
     }
 
     public function create()
@@ -48,6 +50,27 @@ class QuestionController extends Controller
         $question->save();
 
         return redirect()->route('questions.index');
+    }
+
+    public function edit($id)
+    {
+        $question = Question::findOrFail($id);
+
+        return view('questions.edit', [
+            'question' => $question
+        ]);
+    }
+
+    public function update($id, EditQuestion $request)
+    {
+        $question = Question::findOrFail($id);
+
+        $question->title = $request->title;
+        $question->content = $request->content;
+        $question->save();
+
+        return redirect()->route('questions.show', ['question' => $question->id]);
+
     }
 
     public function destroy($id)
